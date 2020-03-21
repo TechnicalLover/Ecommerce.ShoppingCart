@@ -6,7 +6,7 @@ namespace ShoppingCartService.EventFeed
     {
         public long SequenceNumber { get; set; }
 
-        public DateTimeOffset OccuredAt { get; set; }
+        public DateTimeOffset OccurredAt { get; set; }
 
         public string Name { get; set; }
 
@@ -14,12 +14,12 @@ namespace ShoppingCartService.EventFeed
 
         public Event(
             long sequenceNumber,
-            DateTimeOffset occuredAt,
+            DateTimeOffset occurredAt,
             string name,
             object content)
         {
             SequenceNumber = sequenceNumber;
-            OccuredAt = occuredAt;
+            OccurredAt = occurredAt;
             Name = name;
             Content = content;
         }

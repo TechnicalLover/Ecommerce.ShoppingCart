@@ -35,7 +35,7 @@ namespace ShoppingCartService
             base.ConfigureApplicationContainer(container);
 
             container.Register<IShoppingCartStore, ShoppingCartStore>().AsSingleton();
-            container.Register<IEventStore, EventStore>().AsSingleton();
+            container.Register<IEventStore, SqlEventStore>().AsSingleton();
             container.Register<IProductCatalogClient, ProductCatalogClient>().AsMultiInstance();
 
             container.Configure<ProductCatalogClientConfig>(_configuration.GetSection("ProductCatalogClient"));
