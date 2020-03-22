@@ -1,6 +1,7 @@
 namespace ShoppingCartService.ShoppingCart
 {
     using System.Threading.Tasks;
+    using ShoppingCartService.Models.Dto;
 
     public interface IShoppingCartStore
     {

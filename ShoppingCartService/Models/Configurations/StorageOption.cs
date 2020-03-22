@@ -1,4 +1,4 @@
-namespace ShoppingCartService.EventFeed.Configurations
+namespace ShoppingCartService.Models.Configurations
 {
     public static class StorageOption
     {

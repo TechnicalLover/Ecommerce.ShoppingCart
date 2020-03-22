@@ -1,4 +1,4 @@
-namespace ShoppingCartService.EventFeed
+namespace ShoppingCartService.Models.Dto
 {
     using System;
 

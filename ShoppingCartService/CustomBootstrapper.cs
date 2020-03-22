@@ -10,11 +10,9 @@ namespace ShoppingCartService
     using Nancy.Configuration;
     using Nancy.Responses.Negotiation;
     using ShoppingCartService.EventFeed;
-    using ShoppingCartService.EventFeed.Configurations;
     using ShoppingCartService.Services;
-    using ShoppingCartService.Services.Configurations;
+    using ShoppingCartService.Models.Configurations;
     using ShoppingCartService.ShoppingCart;
-    using ShoppingCartService.ShoppingCart.Configurations;
 
     public class CustomBootstrapper : AutofacNancyBootstrapper
     {

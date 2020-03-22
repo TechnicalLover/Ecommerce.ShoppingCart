@@ -1,4 +1,4 @@
-namespace ShoppingCartService.ShoppingCart.MetaModels
+namespace ShoppingCartService.Models.MetaModels
 {
     public class AddItem
     {

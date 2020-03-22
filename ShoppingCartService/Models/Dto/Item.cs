@@ -1,8 +1,5 @@
-namespace ShoppingCartService.ShoppingCart
+namespace ShoppingCartService.Models.Dto
 {
-    using System.Collections.Generic;
-    using System.Linq;
-
     public class Item
     {
         public int ProductItemCode { get; }

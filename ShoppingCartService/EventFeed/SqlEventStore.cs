@@ -6,7 +6,8 @@ namespace ShoppingCartService.EventFeed
     using System.Threading.Tasks;
     using System.Data.SqlClient;
     using Newtonsoft.Json;
-    using ShoppingCartService.EventFeed.Configurations;
+    using ShoppingCartService.Models.Configurations;
+    using ShoppingCartService.Models.Dto;
     using Dapper;
 
     public class SqlEventStore : IEventStore

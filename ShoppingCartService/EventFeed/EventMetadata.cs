@@ -1,7 +1,7 @@
-using System;
-
 namespace ShoppingCartService.EventFeed
 {
+    using System;
+
     public class EventMetadata
     {
         public DateTimeOffset OccurredAt { get; set; }

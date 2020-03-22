@@ -7,7 +7,8 @@ namespace ShoppingCartService.EventFeed
     using System.Threading.Tasks;
     using global::EventStore.ClientAPI;
     using Newtonsoft.Json;
-    using ShoppingCartService.EventFeed.Configurations;
+    using ShoppingCartService.Models.Configurations;
+    using ShoppingCartService.Models.Dto;
 
     public class EventStore : IEventStore
     {

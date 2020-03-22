@@ -3,8 +3,8 @@ namespace ShoppingCartService.Services
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using ShoppingCartService.ShoppingCart;
-    using ShoppingCartService.ShoppingCart.MetaModels;
+    using ShoppingCartService.Models.Dto;
+    using ShoppingCartService.Models.MetaModels;
 
     public interface IProductCatalogClient
     {

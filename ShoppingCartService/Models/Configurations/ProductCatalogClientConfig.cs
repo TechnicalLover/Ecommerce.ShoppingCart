@@ -1,4 +1,4 @@
-namespace ShoppingCartService.Services.Configurations
+namespace ShoppingCartService.Models.Configurations
 {
     public class ProductCatalogClientConfig
     {
