@@ -41,7 +41,7 @@ namespace ShoppingCartService.Services
 
         private async Task<IEnumerable<Item>> GetItemFromProductCatalogService(AddItem[] addItems)
         {
-            int[] productItemCodes = addItems.Select(item => item.ProductItemCode).ToArray();
+            int[] productItemCodes = addItems.Select(item => item.ProductCode).ToArray();
             var response = await
                 RequestProductFromApi(productItemCodes)
                 .ConfigureAwait(false);
@@ -68,21 +68,17 @@ namespace ShoppingCartService.Services
                 await response.Content.ReadAsStringAsync().ConfigureAwait(false));
             return products.Select(p =>
             {
-                var addItem = addItems.First(item => item.ProductItemCode == p.ProductItemCode);
-
-                var selectedFormat = p.GetFormat(addItem.ProductUnitCode);
+                var addItem = addItems.First(item => item.ProductCode == p.ProductItemCode);
+                var selectedFormat = p.GetFormat(addItem.UnitCode);
                 var price = selectedFormat.GetRetailerPrice();
-                var format = new ItemFormat(
-                    new ItemUnit(
-                        selectedFormat.Unit.UnitCode,
-                        selectedFormat.Unit.UnitName,
-                        selectedFormat.Unit.Conversion),
-                    new ItemPrice(price.Currency, price.Amount));
-                return new Item(p.ProductItemCode,
+                return new Item(
+                    p.ProductItemCode,
                     p.ProductItemName,
-                    addItem.ProductItemCode,
+                    selectedFormat.Unit.UnitCode,
+                    selectedFormat.Unit.UnitName,
+                    price.Currency,
+                    price.Amount,
                     addItem.Quantity,
-                    format,
                     p.Description);
             });
         }

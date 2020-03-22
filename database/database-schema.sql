@@ -48,11 +48,14 @@ CREATE TABLE [dbo].[shopping_cart_items]
     -- primary key column
     [ShoppingCartId] INT NOT NULL,
     -- foreign key column
-    [ProductCatalogId] BIGINT NOT NULL,
+    [ProductCode] BIGINT NOT NULL,
     [ProductName] NVARCHAR(100) NOT NULL,
-    [ProductDescription] NVARCHAR(500) NULL,
+    [UnitCode] BIGINT NOT NULL,
+    [UnitName] NVARCHAR(100) NOT NULL,
     [Amount] INT NOT NULL,
-    [CURRENCY] NVARCHAR(5) NOT NULL
+    [Currency] NVARCHAR(5) NOT NULL,
+    [Quantity] INT NOT NULL,
+    [Description] NVARCHAR(500) NULL
     -- specify more columns here
 );
 GO

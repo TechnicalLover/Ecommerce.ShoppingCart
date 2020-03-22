@@ -11,8 +11,9 @@ namespace ShoppingCartService.Models.Dto
         public int UserId { get; set; }
         public IEnumerable<Item> Items { get { return items; } }
 
-        public ShoppingCart(int userId)
+        public ShoppingCart(int userId, HashSet<Item> items)
         {
+            this.items = items;
             UserId = userId;
         }
 
@@ -22,14 +23,21 @@ namespace ShoppingCartService.Models.Dto
             {
                 if (this.items.Add(item))
                 {
-                    eventStore.Raise("ShoppingCartItemAdded", new { UserId, item });
+                    eventStore.Raise("ItemsAddedToCartEvent", new { UserId, item });
                 }
             }
         }
 
-        public void RemoveItems(int[] productItemCodes, IEventStore eventStore)
+        public void RemoveItems(int[] productCodes, IEventStore eventStore)
         {
-            this.items.RemoveWhere(i => productItemCodes.Contains(i.ProductItemCode));
+            IEnumerable<Item> itemToRemove = this.items.Where(i => productCodes.Contains(i.ProductCode));
+            foreach (var item in itemToRemove)
+            {
+                if (this.items.Remove(item))
+                {
+                    eventStore.Raise("ItemsRemovedFromCartEvent", new { UserId, item });
+                }
+            }
         }
     }
 }
