@@ -6,7 +6,7 @@ namespace ShoppingCartService.ShoppingCart
     using Nancy.ModelBinding;
     using ShoppingCartService.EventFeed;
     using ShoppingCartService.Services;
-    using ShoppingCartService.ShoppingCart.MetaModels;
+    using ShoppingCartService.Models.MetaModels;
 
     public class ShoppingCartModule : NancyModule
     {

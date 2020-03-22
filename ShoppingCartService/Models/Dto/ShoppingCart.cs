@@ -1,4 +1,4 @@
-namespace ShoppingCartService.ShoppingCart
+namespace ShoppingCartService.Models.Dto
 {
     using System.Collections.Generic;
     using System.Linq;

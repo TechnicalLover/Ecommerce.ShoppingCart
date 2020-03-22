@@ -1,4 +1,4 @@
-namespace ShoppingCartService.ShoppingCart.Configurations
+namespace ShoppingCartService.Models.Configurations
 {
     public class ShoppingCartStoreConfig
     {
