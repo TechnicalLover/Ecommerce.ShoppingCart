@@ -1,4 +1,4 @@
-namespace ShoppingCartService.ShoppingCart
+namespace ShoppingCartService.Models.Dto
 {
     public class ItemFormat
     {

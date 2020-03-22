@@ -2,7 +2,8 @@ namespace ShoppingCartService.ShoppingCart
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using ShoppingCartService.ShoppingCart.Configurations;
+    using ShoppingCartService.Models.Configurations;
+    using ShoppingCartService.Models.Dto;
 
     public class ShoppingCartStore : IShoppingCartStore
     {

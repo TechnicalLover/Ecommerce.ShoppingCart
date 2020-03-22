@@ -25,8 +25,8 @@ namespace ShoppingCartService
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var logger = app.ApplicationServices.GetRequiredService<ILogger<TracingBootstrapper>>();
-            app.UseOwin().UseNancy(opt => opt.Bootstrapper = new TracingBootstrapper(Configuration, logger));
+            var logger = app.ApplicationServices.GetRequiredService<ILogger<CustomBootstrapper>>();
+            app.UseOwin().UseNancy(opt => opt.Bootstrapper = new CustomBootstrapper(Configuration, logger));
         }
     }
 }

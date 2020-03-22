@@ -1,7 +1,6 @@
 namespace ShoppingCartService.EventFeed
 {
     using System;
-    using System.Threading.Tasks;
     using Nancy;
 
     public class EventFeedModule : NancyModule

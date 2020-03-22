@@ -7,10 +7,10 @@ namespace ShoppingCartService.Services
     using System.Threading.Tasks;
     using Newtonsoft.Json;
     using Polly;
-    using ShoppingCartService.Services.Configurations;
+    using ShoppingCartService.Models.Configurations;
+    using ShoppingCartService.Models.Dto;
+    using ShoppingCartService.Models.MetaModels;
     using ShoppingCartService.Services.Response;
-    using ShoppingCartService.ShoppingCart;
-    using ShoppingCartService.ShoppingCart.MetaModels;
 
     public class ProductCatalogClient : IProductCatalogClient
     {
