@@ -1,4 +1,4 @@
-# ShoppingCartService
+# ECommerce Shoppping Cart
 
 > Business Capabilities
 >
