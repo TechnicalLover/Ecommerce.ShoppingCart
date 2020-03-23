@@ -2,7 +2,7 @@ namespace ShoppingCartService.Services.Response
 {
     public class ProductPriceResponse
     {
-        public int PriceCode { get; set; }
+        public int Id { get; set; }
 
         public string PriceName { get; set; }
 

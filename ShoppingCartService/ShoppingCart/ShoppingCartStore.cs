@@ -21,15 +21,40 @@ namespace ShoppingCartService.ShoppingCart
 
         public async Task<ShoppingCart> Get(int userId)
         {
-            string readItemsSql = @"SELECT * FROM ShoppingCart, ShoppingCartItems 
-                WHERE ShoppingCartItems.ShoppingCartId = ID 
-                AND ShoppingCart.UserId = @UserId";
+            string readShoppingCartSql = @"SELECT * FROM ShoppingCart WHERE ShoppingCart.UserId = @UserId";
+            string addShoppingCartSql = @"INSERT INTO ShoppingCart (UserId) VALUES (@UserId)";
+            string readItemsSql = @"SELECT * FROM ShoppingCartItems 
+                WHERE ShoppingCartItems.ShoppingCartId = @ShoppingCartId";
+
             using (var conn = new SqlConnection(_connectionString))
+            using (var tx = conn.BeginTransaction())
             {
+                var shoppingCart = (await conn.QueryAsync<ShoppingCart>(
+                    readShoppingCartSql,
+                    new { UserId = userId },
+                    tx).ConfigureAwait(false))
+                    .SingleOrDefault();
+                if (shoppingCart == null)
+                {
+                    await conn.ExecuteAsync(
+                        addShoppingCartSql,
+                        new { UserId = shoppingCart.UserId },
+                        tx).ConfigureAwait(false);
+                    shoppingCart = (await conn.QueryAsync<ShoppingCart>(
+                        readShoppingCartSql,
+                        new { UserId = userId },
+                        tx).ConfigureAwait(false))
+                        .Single();
+                    return shoppingCart;
+                }
+
                 var items = await conn.QueryAsync<Item>(
                     readItemsSql,
-                    new { UserId = userId });
-                return new ShoppingCart(userId, items.ToHashSet());
+                    new { ShoppingCartId = shoppingCart.Id },
+                    tx).ConfigureAwait(false);
+
+                await tx.CommitAsync();
+                return new ShoppingCart(shoppingCart.Id, userId, items.ToHashSet());
             }
         }
 
@@ -38,10 +63,6 @@ namespace ShoppingCartService.ShoppingCart
             string deleteAllItemsForShoppingCartSql = @"DELETE item FROM ShoppingCartItems item
                 INNER JOIN ShoppingCart cart ON item.ShoppingCartId = cart.ID
                 AND cart.UserId=@UserId";
-            string deleteShoppingCartSql = @"DELETE cart FROM ShoppingCart cart 
-                WHERE cart.UserId=@UserId";
-            string addShoppingCartSql = @"INSERT INTO ShoppingCart (UserId) VALUES (@UserId)";
-            string readNewShoppingCartSql = @"SELECT ID FROM ShoppingCart WHERE ShoppingCart.UserId = @UserId";
             string addAllForItemsShoppingCartSql = @"INSERT INTO ShoppingCartItems 
                 (ShoppingCartId, ProductCode, ProductName, 
                 UnitCode, UnitName, Amount, Currency, Quantity, Description)
@@ -59,25 +80,11 @@ namespace ShoppingCartService.ShoppingCart
                     tx).ConfigureAwait(false);
 
                 await conn.ExecuteAsync(
-                    deleteShoppingCartSql,
-                    new { UserId = shoppingCart.UserId },
-                    tx).ConfigureAwait(false);
-
-                await conn.ExecuteAsync(
-                    addShoppingCartSql,
-                    new { UserId = shoppingCart.UserId },
-                    tx).ConfigureAwait(false);
-
-                var newShoppingCartId = await conn.QueryAsync<int>(
-                    readNewShoppingCartSql,
-                    new { UserId = shoppingCart.UserId });
-
-                await conn.ExecuteAsync(
                     addAllForItemsShoppingCartSql,
                     shoppingCart.Items.Select(item =>
                         new
                         {
-                            ShoppingCartId = newShoppingCartId,
+                            ShoppingCartId = shoppingCart.Id,
                             ProductCode = item.ProductCode,
                             ProductName = item.ProductName,
                             UnitCode = item.UnitCode,
@@ -88,6 +95,8 @@ namespace ShoppingCartService.ShoppingCart
                             Description = item.Description
                         }),
                     tx).ConfigureAwait(false);
+
+                await tx.CommitAsync();
             }
         }
     }

@@ -4,7 +4,7 @@ namespace ShoppingCartService.Services.Response
 {
     public class ProductFormatResponse
     {
-        public int FormatCode { get; set; }
+        public int Id { get; set; }
 
         public string FormatName { get; set; }
 

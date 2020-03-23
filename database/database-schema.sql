@@ -1,7 +1,6 @@
 USE master
 GO
 
--- Create a new database called 'ecommerce_masterdata'
 -- Connect to the 'master' database to run this snippet
 USE master
 GO
@@ -9,15 +8,14 @@ GO
 IF NOT EXISTS (
     SELECT name
 FROM [sys].[databases]
-WHERE name = N'ecommerce_masterdata'
+WHERE name = N'ecommerce_shoppingcart_database'
 )
-CREATE DATABASE ecommerce_masterdata
+CREATE DATABASE ecommerce_shoppingcart_database
 GO
 
-USE [ecommerce_masterdata]
+USE [ecommerce_shoppingcart_database]
 GO
 
--- Create a new table called 'shopping_cart' in schema 'SchemaName'
 -- Drop the table if it already exists
 IF OBJECT_ID('dbo.shopping_cart', 'U') IS NOT NULL
 DROP TABLE [dbo].[shopping_cart]
@@ -36,7 +34,6 @@ CREATE INDEX shoppingcart_userid
 ON [dbo].[shopping_cart] (UserId)
 GO
 
--- Create a new table called 'shopping_cart_items' in schema 'SchemaName'
 -- Drop the table if it already exists
 IF OBJECT_ID('dbo.shopping_cart_items', 'U') IS NOT NULL
 DROP TABLE [dbo].[shopping_cart_items]
@@ -71,7 +68,6 @@ CREATE INDEX shoppingcartitems_shoppingcartid
 ON [dbo].[shopping_cart_items] (ShoppingCartId)
 GO
 
--- Create a new table called 'event_store' in schema 'dbo'
 -- Drop the table if it already exists
 IF OBJECT_ID('dbo.event_store', 'U') IS NOT NULL
 DROP TABLE [dbo].[event_store]

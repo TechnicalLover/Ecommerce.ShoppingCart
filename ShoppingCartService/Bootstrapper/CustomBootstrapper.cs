@@ -40,6 +40,7 @@ namespace ShoppingCartService
 
             container.Configure<ProductCatalogClientConfig>(_configuration.GetSection("ProductCatalogClient"));
             container.Update(builder => builder.RegisterType<ProductCatalogClient>().As<IProductCatalogClient>());
+            container.Update(builder => builder.RegisterType<InmemoryCache>().As<ICache>());
 
             container.Configure<EventStoreConfig>(_configuration.GetSection("EventStore"));
             container.Update(builder => builder.Register<IEventStore>(context =>

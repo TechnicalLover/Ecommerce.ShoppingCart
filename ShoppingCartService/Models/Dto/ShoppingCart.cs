@@ -8,13 +8,21 @@ namespace ShoppingCartService.Models.Dto
     {
         private HashSet<Item> items = new HashSet<Item>();
 
-        public int UserId { get; set; }
+        public int Id { get; }
+        public int UserId { get; }
         public IEnumerable<Item> Items { get { return items; } }
 
-        public ShoppingCart(int userId, HashSet<Item> items)
+        public ShoppingCart(int id, int userId)
         {
-            this.items = items;
+            Id = id;
             UserId = userId;
+        }
+
+        public ShoppingCart(int id, int userId, HashSet<Item> items)
+        {
+            Id = id;
+            UserId = userId;
+            this.items = items;
         }
 
         public void AddItems(IEnumerable<Item> items, IEventStore eventStore)

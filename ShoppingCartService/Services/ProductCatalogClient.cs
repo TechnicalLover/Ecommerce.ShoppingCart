@@ -4,6 +4,7 @@ namespace ShoppingCartService.Services
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
+    using System.Net.Http.Headers;
     using System.Threading.Tasks;
     using Newtonsoft.Json;
     using Polly;
@@ -15,10 +16,12 @@ namespace ShoppingCartService.Services
     public class ProductCatalogClient : IProductCatalogClient
     {
         private readonly string productCatalogBaseUrl;
-        private readonly string getProductPathTemplate = "/products?productItemCodes=[{0}]";
+        private readonly string getProductPathTemplate = "/products?productIds=[{0}]";
+        private readonly ICache _cache;
 
-        public ProductCatalogClient(ProductCatalogClientConfig config)
+        public ProductCatalogClient(ProductCatalogClientConfig config, ICache cache)
         {
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             if (config is null)
                 throw new ArgumentNullException(nameof(config));
             productCatalogBaseUrl = config.BaseUrl;
@@ -41,24 +44,44 @@ namespace ShoppingCartService.Services
 
         private async Task<IEnumerable<Item>> GetItemFromProductCatalogService(AddItem[] addItems)
         {
-            int[] productItemCodes = addItems.Select(item => item.ProductCode).ToArray();
+            int[] productIds = addItems.Select(item => item.ProductCode).ToArray();
             var response = await
-                RequestProductFromApi(productItemCodes)
+                RequestProductFromApi(productIds)
                 .ConfigureAwait(false);
             return await ConvertToItems(response, addItems)
                 .ConfigureAwait(false);
         }
 
-        private async Task<HttpResponseMessage> RequestProductFromApi(int[] productItemCodes)
+        private async Task<HttpResponseMessage> RequestProductFromApi(int[] productIds)
         {
             var productsResource = string.Format(
-                getProductPathTemplate, string.Join(",", productItemCodes));
-
-            using (var httpClient = new HttpClient())
+                getProductPathTemplate, string.Join(",", productIds));
+            var cachedResponse = this._cache.Get(productsResource) as HttpResponseMessage;
+            if (cachedResponse == null)
             {
-                httpClient.BaseAddress = new System.Uri(productCatalogBaseUrl);
-                return await httpClient.GetAsync(productsResource).ConfigureAwait(false);
+                using (var httpClient = new HttpClient())
+                {
+                    httpClient.BaseAddress = new System.Uri(productCatalogBaseUrl);
+                    var response = await httpClient.GetAsync(productsResource).ConfigureAwait(false);
+                    AddToCache(productsResource, response);
+                    return response;
+                }
             }
+            return cachedResponse;
+        }
+
+        private void AddToCache(string resource, HttpResponseMessage response)
+        {
+            var cacheHeader = response
+                .Headers
+                .FirstOrDefault(h => h.Key == "cache-control");
+            if (string.IsNullOrEmpty(cacheHeader.Key))
+                return;
+            var maxAge =
+                CacheControlHeaderValue.Parse(cacheHeader.Value.ToString())
+                .MaxAge;
+            if (maxAge.HasValue)
+                this._cache.Add(key: resource, value: resource, timeToLife: maxAge.Value);
         }
 
         private async Task<IEnumerable<Item>> ConvertToItems(HttpResponseMessage response, AddItem[] addItems)
@@ -66,20 +89,20 @@ namespace ShoppingCartService.Services
             response.EnsureSuccessStatusCode();
             var products = JsonConvert.DeserializeObject<List<ProductCatalogResponse>>(
                 await response.Content.ReadAsStringAsync().ConfigureAwait(false));
-            return products.Select(p =>
+            return products.Select(product =>
             {
-                var addItem = addItems.First(item => item.ProductCode == p.ProductItemCode);
-                var selectedFormat = p.GetFormat(addItem.UnitCode);
+                var addItem = addItems.First(item => item.ProductCode == product.Id);
+                var selectedFormat = product.GetFormat(addItem.UnitCode);
                 var price = selectedFormat.GetRetailerPrice();
                 return new Item(
-                    p.ProductItemCode,
-                    p.ProductItemName,
-                    selectedFormat.Unit.UnitCode,
+                    product.Id,
+                    product.ProductName,
+                    selectedFormat.Unit.Id,
                     selectedFormat.Unit.UnitName,
                     price.Currency,
                     price.Amount,
                     addItem.Quantity,
-                    p.Description);
+                    product.Description);
             });
         }
     }
