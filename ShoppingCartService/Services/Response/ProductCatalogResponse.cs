@@ -4,9 +4,9 @@ namespace ShoppingCartService.Services.Response
 {
     public class ProductCatalogResponse
     {
-        public int ProductItemCode { get; set; }
+        public int Id { get; set; }
 
-        public string ProductItemName { get; set; }
+        public string ProductName { get; set; }
 
         public int DivisionCode { get; set; }
 
@@ -28,12 +28,12 @@ namespace ShoppingCartService.Services.Response
 
         public ProductFormatResponse GetFormat(int unitCode)
         {
-            if (BundleFormat.Unit.UnitCode == unitCode)
+            if (BundleFormat.Unit.Id == unitCode)
             {
                 return BundleFormat;
             }
 
-            if (UpcFormat.Unit.UnitCode == unitCode)
+            if (UpcFormat.Unit.Id == unitCode)
             {
                 return UpcFormat;
             }

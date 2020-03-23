@@ -2,26 +2,32 @@ namespace ShoppingCartService.Models.Dto
 {
     public class Item
     {
-        public int ProductItemCode { get; }
+        public int ProductCode { get; }
 
-        public string ProductItemName { get; }
+        public string ProductName { get; }
 
-        public int SelectedUnitCode { get; }
+        public int UnitCode { get; }
+
+        public string UnitName { get; }
+
+        public string Currency { get; }
+
+        public decimal Amount { get; }
 
         public int Quantity { get; private set; }
 
-        public ItemFormat Format { get; }
-
         public string Description { get; }
 
-        public Item(int productItemCode, string productItemName, int selectedUnitCode, int quantity, ItemFormat format, string description)
+        public Item(int productCode, string productName, int unitCode, string unitName, string currency, decimal amount, int quantity, string description)
         {
-            ProductItemCode = productItemCode;
-            ProductItemName = productItemName;
-            SelectedUnitCode = selectedUnitCode;
+            ProductCode = productCode;
+            ProductName = productName;
+            UnitCode = unitCode;
+            UnitName = unitName;
+            Currency = currency;
+            Amount = amount;
             Quantity = quantity;
             Description = description;
-            Format = format;
         }
 
         public void SetQuantity(int quantity)
@@ -38,14 +44,14 @@ namespace ShoppingCartService.Models.Dto
             }
 
             var that = obj as Item;
-            return this.ProductItemCode.Equals(that.ProductItemCode)
-                && this.SelectedUnitCode.Equals(that.SelectedUnitCode);
+            return this.ProductCode.Equals(that.ProductCode)
+                && this.UnitCode.Equals(that.UnitCode);
         }
 
         // override object.GetHashCode
         public override int GetHashCode()
         {
-            return this.ProductItemCode.GetHashCode() + this.SelectedUnitCode.GetHashCode();
+            return this.ProductCode.GetHashCode() + this.UnitCode.GetHashCode();
         }
     }
 }
