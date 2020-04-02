@@ -25,7 +25,7 @@ namespace ShoppingCartService.EventFeed
             long firstEventSequenceNumber,
             long lastEventSequenceNumber)
         {
-            string readEventsSql = @"select * from EventStore where ID >= @Start and ID <= @End";
+            string readEventsSql = @"select * from event_store where ID >= @Start and ID <= @End";
             using (var conn = new SqlConnection(_connectionString))
             {
                 return (await conn.QueryAsync<dynamic>(
@@ -45,7 +45,7 @@ namespace ShoppingCartService.EventFeed
 
         public async Task Raise(string eventName, object content)
         {
-            string writeEventSql = @"insert into EventStore(Name, OccurredAt, Content) values (@Name, @OccurredAt, @Content)";
+            string writeEventSql = @"insert into event_store(Name, OccurredAt, Content) values (@Name, @OccurredAt, @Content)";
             var jsonContent = JsonConvert.SerializeObject(content);
             using (var conn = new SqlConnection(_connectionString))
             {

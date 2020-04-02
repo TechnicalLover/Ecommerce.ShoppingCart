@@ -17,12 +17,14 @@ namespace ShoppingCartService
     public class CustomBootstrapper : AutofacNancyBootstrapper
     {
         private readonly IConfiguration _configuration;
-        private readonly ILogger<CustomBootstrapper> _logger;
+        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public CustomBootstrapper(IConfiguration configuration, ILogger<CustomBootstrapper> logger)
+        public CustomBootstrapper(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+            _logger = _loggerFactory.CreateLogger(nameof(CustomBootstrapper));
         }
 
         protected override void ApplicationStartup(ILifetimeScope container, IPipelines pipelines)

@@ -8,11 +8,12 @@
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build solution",
+
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/ShoppingCartService/bin/Debug/netcoreapp3.1/ShoppingCartService.dll",
+            "program": "${workspaceFolder}/${input:target}/bin/Debug/${input:framework}/${input:target}.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/ShoppingCartService",
+            "cwd": "${workspaceFolder}/${input:target}",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             // "serverReadyAction": {
@@ -20,10 +21,10 @@
             //     "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
             // },
             "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
+                "ASPNETCORE_ENVIRONMENT": "${input:environment}"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceFolder}/ShoppingCartService/Views"
+                "/Views": "${workspaceFolder}/${input:target}/Views"
             }
         },
         {
@@ -31,6 +32,29 @@
             "type": "coreclr",
             "request": "attach",
             "processId": "${command:pickProcess}"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "target",
+            "description": "[LAUNCH] Select startup project:",
+            "options": ["ShoppingCartService"],
+            "default": "ShoppingCartService",
+            "type": "pickString"
+        },
+        {
+            "id": "framework",
+            "description": "[LAUNCH] Select framework:",
+            "options": ["netcoreapp2.1", "netcoreapp3.1"],
+            "default": "netcoreapp3.1",
+            "type": "pickString"
+        },
+        {
+            "id": "environment",
+            "description": "[LAUNCH] Select environment:",
+            "options": ["Local", "Development", "Uat", "Production"],
+            "default": "Development",
+            "type": "pickString"
         }
     ]
 }

@@ -21,10 +21,10 @@ namespace ShoppingCartService.ShoppingCart
 
         public async Task<ShoppingCart> Get(int userId)
         {
-            string readShoppingCartSql = @"SELECT * FROM ShoppingCart WHERE ShoppingCart.UserId = @UserId";
-            string addShoppingCartSql = @"INSERT INTO ShoppingCart (UserId) VALUES (@UserId)";
-            string readItemsSql = @"SELECT * FROM ShoppingCartItems 
-                WHERE ShoppingCartItems.ShoppingCartId = @ShoppingCartId";
+            string readShoppingCartSql = @"SELECT * FROM shopping_cart WHERE shopping_cart.UserId = @UserId";
+            string addShoppingCartSql = @"INSERT INTO shopping_cart (UserId) VALUES (@UserId)";
+            string readItemsSql = @"SELECT * FROM shopping_cart_items 
+                WHERE shopping_cart_items.ShoppingCartId = @ShoppingCartId";
 
             using (var conn = new SqlConnection(_connectionString))
             using (var tx = conn.BeginTransaction())
@@ -60,10 +60,10 @@ namespace ShoppingCartService.ShoppingCart
 
         public async Task Save(ShoppingCart shoppingCart)
         {
-            string deleteAllItemsForShoppingCartSql = @"DELETE item FROM ShoppingCartItems item
-                INNER JOIN ShoppingCart cart ON item.ShoppingCartId = cart.ID
+            string deleteAllItemsForShoppingCartSql = @"DELETE item FROM shopping_cart_items item
+                INNER JOIN shopping_cart cart ON item.ShoppingCartId = cart.ID
                 AND cart.UserId=@UserId";
-            string addAllForItemsShoppingCartSql = @"INSERT INTO ShoppingCartItems 
+            string addAllForItemsShoppingCartSql = @"INSERT INTO shopping_cart_items 
                 (ShoppingCartId, ProductCode, ProductName, 
                 UnitCode, UnitName, Amount, Currency, Quantity, Description)
                 VALUES 

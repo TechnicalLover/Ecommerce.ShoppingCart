@@ -5,9 +5,23 @@
             "label": "build",
             "command": "dotnet",
             "type": "process",
+            "group": "build",
             "args": [
                 "build",
-                "${workspaceFolder}/ShoppingCartService/ShoppingCartService.csproj",
+                "${workspaceFolder}/${input:target}",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build solution",
+            "command": "dotnet",
+            "type": "process",
+            "group": "build",
+            "args": [
+                "build",
+                "${workspaceFolder}/${input:targetSolution}",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -17,19 +31,8 @@
             "label": "clean",
             "command": "dotnet",
             "type": "process",
-            "args": ["clean"],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "publish",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "publish",
-                "${workspaceFolder}/ShoppingCartService/ShoppingCartService.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
-            ],
+            "group": "build",
+            "args": ["clean", "${workspaceFolder}/${input:target}"],
             "problemMatcher": "$msCompile"
         },
         {
@@ -39,11 +42,136 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/ShoppingCartService/ShoppingCartService.csproj",
+                "${workspaceFolder}/${input:target}",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/${input:target}",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "pack",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "pack",
+                "${workspaceFolder}/${input:target}",
+                "-o",
+                "./packages"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "nuget push",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "nuget",
+                "push",
+                "-s",
+                "${input:nugetServer}",
+                "-k",
+                "${input:nugetServerApiKey}",
+                "${workspaceFolder}/packages/${input:targetProject}.${input:version}.nupkg"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "add package",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "add",
+                "${workspaceFolder}/${input:targetProject}",
+                "package",
+                "${input:packageToAdd}",
+                "-s",
+                "${input:nugetServer}"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "add reference",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "add",
+                "${workspaceFolder}/${input:targetProject}",
+                "reference",
+                "${input:referenceToAdd}"
+            ],
+            "problemMatcher": "$msCompile"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "target",
+            "description": "Solution/Project:",
+            "options": [
+                "ShoppingCart.sln",
+                "ShoppingCartService/ShoppingCartService.csproj"
+            ],
+            "default": "ShoppingCart.sln",
+            "type": "pickString"
+        },
+        {
+            "id": "targetSolution",
+            "description": "Solution:",
+            "options": ["ShoppingCart.sln"],
+            "default": "ShoppingCart.sln",
+            "type": "pickString"
+        },
+        {
+            "id": "targetProject",
+            "description": "Project:",
+            "options": ["ShoppingCartService/ShoppingCartService.csproj"],
+            "default": "ShoppingCartService/ShoppingCartService.csproj",
+            "type": "pickString"
+        },
+        {
+            "id": "nugetServer",
+            "description": "Nuget Server Feed:",
+            "options": [
+                "http://kipmovin.me:5555/v3/index.json",
+                "https://api.nuget.org/v3/index.json"
+            ],
+            "default": "https://api.nuget.org/v3/index.json",
+            "type": "pickString"
+        },
+        {
+            "id": "nugetServerApiKey",
+            "description": "Nuget Server Api Key:",
+            "default": "NUGET-SERVER-API-KEY",
+            "type": "promptString"
+        },
+        {
+            "id": "version",
+            "description": "Version:",
+            "default": "1.0.0",
+            "type": "promptString"
+        },
+        {
+            "id": "packageToAdd",
+            "description": "Package Name:",
+            "default": "Newtonsoft.Json",
+            "type": "promptString"
+        },
+        {
+            "id": "referenceToAdd",
+            "description": "Path to reference (.csproj file):",
+            "default": "./SalesHUB.{ClassLibProject}/SalesHUB.{ClassLibProject}.csproj",
+            "type": "promptString"
         }
     ]
 }
