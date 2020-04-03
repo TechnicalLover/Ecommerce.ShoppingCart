@@ -109,7 +109,7 @@
                 "add",
                 "${workspaceFolder}/${input:targetProject}",
                 "reference",
-                "${input:referenceToAdd}"
+                "./${input:referenceToAdd}/${input:referenceToAdd}.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
@@ -170,7 +170,7 @@
         {
             "id": "referenceToAdd",
             "description": "Path to reference (.csproj file):",
-            "default": "./SalesHUB.{ClassLibProject}/SalesHUB.{ClassLibProject}.csproj",
+            "default": "ClassLibProject",
             "type": "promptString"
         }
     ]

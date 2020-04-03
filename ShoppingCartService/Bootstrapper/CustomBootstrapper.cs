@@ -3,7 +3,6 @@ namespace ShoppingCartService
     using System;
     using Autofac;
     using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
     using Nancy;
     using Nancy.Bootstrapper;
     using Nancy.Bootstrappers.Autofac;
@@ -13,24 +12,26 @@ namespace ShoppingCartService
     using ShoppingCartService.Services;
     using ShoppingCartService.Models.Configurations;
     using ShoppingCartService.ShoppingCart;
+    using Nancy.Owin;
+    using Serilog;
 
     public class CustomBootstrapper : AutofacNancyBootstrapper
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
-        private readonly ILoggerFactory _loggerFactory;
 
-        public CustomBootstrapper(IConfiguration configuration, ILoggerFactory loggerFactory)
+        public CustomBootstrapper(IConfiguration configuration, ILogger logger)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-            _logger = _loggerFactory.CreateLogger(nameof(CustomBootstrapper));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         protected override void ApplicationStartup(ILifetimeScope container, IPipelines pipelines)
         {
             base.ApplicationStartup(container, pipelines);
-            pipelines.OnError += OnError;
+
+            // we have GlobalErrorMiddleware to catch all unhandled exceptions
+            //pipelines.OnError += OnError;
         }
 
         protected override void ConfigureApplicationContainer(ILifetimeScope container)
@@ -60,12 +61,17 @@ namespace ShoppingCartService
                         }
                 }
             }));
+
+            container.Update(builder => builder.RegisterInstance(_logger).As<ILogger>());
         }
 
         protected override void ConfigureRequestContainer(ILifetimeScope container, NancyContext context)
         {
-            // no scoped denpendency.
             base.ConfigureRequestContainer(container, context);
+
+            // get correlation token from owin context which had been added before by CorrelationTokenMiddleware
+            var correlationToken = context.GetOwinEnvironment()["correlationToken"] as string;
+            container.Update(builder => builder.RegisterInstance(new HttpClientFactory(correlationToken)).As<IHttpClientFactory>());
         }
 
         public override void Configure(INancyEnvironment env)
@@ -75,7 +81,7 @@ namespace ShoppingCartService
 
         private Response OnError(NancyContext context, Exception ex)
         {
-            _logger.LogError(ex, "An unhandled error occured.");
+            _logger.Error(ex, "An unhandled error occured.");
             var negotiator = ApplicationContainer.Resolve<IResponseNegotiator>();
             return negotiator.NegotiateResponse(new
             {

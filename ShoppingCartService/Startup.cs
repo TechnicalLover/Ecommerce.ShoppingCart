@@ -6,13 +6,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Nancy.Owin;
 using Serilog;
 using Serilog.Events;
-using ShoppingCartService.Middlewares;
 using ShoppingCartService.Models.Configurations;
 using ShoppingCartService.Models.Constants;
+using TechnicalLover.Common.AspNetCore.Middlewares;
 
 namespace ShoppingCartService
 {
@@ -51,11 +50,14 @@ namespace ShoppingCartService
             //     };
             // });
 
-            var loggerFactory = app.ApplicationServices.GetRequiredService<ILoggerFactory>();
+            var logger = app.ApplicationServices.GetRequiredService<ILogger>();
             app.UseOwin(buildFunc =>
             {
+                buildFunc(next => new CorrelationTokenMiddleware(next).Invoke);
+                buildFunc(next => new LoggingMiddleware(next, logger).Invoke);
+                buildFunc(next => new RequestPerformanceMiddleware(next, logger).Invoke);
                 buildFunc(next => new MonitoringMiddleware(next, HealthCheck).Invoke);
-                buildFunc.UseNancy(opt => opt.Bootstrapper = new CustomBootstrapper(Configuration, loggerFactory));
+                buildFunc.UseNancy(opt => opt.Bootstrapper = new CustomBootstrapper(Configuration, logger));
             });
         }
 

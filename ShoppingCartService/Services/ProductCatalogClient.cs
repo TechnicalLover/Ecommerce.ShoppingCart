@@ -1,11 +1,11 @@
 namespace ShoppingCartService.Services
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Net.Http;
     using System.Net.Http.Headers;
+    using System.Net.Http;
     using System.Threading.Tasks;
+    using System;
     using Newtonsoft.Json;
     using Polly;
     using ShoppingCartService.Models.Configurations;
@@ -15,38 +15,40 @@ namespace ShoppingCartService.Services
 
     public class ProductCatalogClient : IProductCatalogClient
     {
-        private readonly string productCatalogBaseUrl;
-        private readonly string getProductPathTemplate = "/products?productIds=[{0}]";
+        private readonly string _productCatalogBaseUrl;
+        private readonly string _getProductPathTemplate = "/products?productIds=[{0}]";
         private readonly ICache _cache;
+        private readonly ShoppingCartService.IHttpClientFactory _httpClientFactory;
 
-        public ProductCatalogClient(ProductCatalogClientConfig config, ICache cache)
+        public ProductCatalogClient(ProductCatalogClientConfig config, ShoppingCartService.IHttpClientFactory httpClientFactory, ICache cache)
         {
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             if (config is null)
                 throw new ArgumentNullException(nameof(config));
-            productCatalogBaseUrl = config.BaseUrl;
+            _productCatalogBaseUrl = config.BaseUrl;
+            _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
 
         private static IAsyncPolicy exponentialRetryPolicy =
             Policy
-                .Handle<Exception>()
-                .WaitAndRetryAsync(
-                    3,
-                    attemp => TimeSpan.FromMilliseconds(100 * Math.Pow(2, attemp)),
-                    (ex, _) => Console.WriteLine(ex.ToString())
-                );
+            .Handle<Exception>()
+            .WaitAndRetryAsync(
+                3,
+                attemp => TimeSpan.FromMilliseconds(100 * Math.Pow(2, attemp)),
+                (ex, _) => Console.WriteLine(ex.ToString())
+            );
 
         public Task<IEnumerable<Item>> GetShoppingCartItems(AddItem[] addItems) =>
             exponentialRetryPolicy
-                .ExecuteAsync(async () =>
-                    await GetItemFromProductCatalogService(addItems)
-                        .ConfigureAwait(false));
+            .ExecuteAsync(async () =>
+               await GetItemFromProductCatalogService(addItems)
+               .ConfigureAwait(false));
 
         private async Task<IEnumerable<Item>> GetItemFromProductCatalogService(AddItem[] addItems)
         {
             int[] productIds = addItems.Select(item => item.ProductCode).ToArray();
             var response = await
-                RequestProductFromApi(productIds)
+            RequestProductFromApi(productIds)
                 .ConfigureAwait(false);
             return await ConvertToItems(response, addItems)
                 .ConfigureAwait(false);
@@ -55,13 +57,12 @@ namespace ShoppingCartService.Services
         private async Task<HttpResponseMessage> RequestProductFromApi(int[] productIds)
         {
             var productsResource = string.Format(
-                getProductPathTemplate, string.Join(",", productIds));
+                _getProductPathTemplate, string.Join(",", productIds));
             var cachedResponse = this._cache.Get(productsResource) as HttpResponseMessage;
             if (cachedResponse == null)
             {
-                using (var httpClient = new HttpClient())
+                using (var httpClient = _httpClientFactory.Create(new System.Uri(_productCatalogBaseUrl)))
                 {
-                    httpClient.BaseAddress = new System.Uri(productCatalogBaseUrl);
                     var response = await httpClient.GetAsync(productsResource).ConfigureAwait(false);
                     AddToCache(productsResource, response);
                     return response;
