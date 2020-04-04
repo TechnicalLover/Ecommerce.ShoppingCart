@@ -112,6 +112,13 @@
                 "./${input:referenceToAdd}/${input:referenceToAdd}.csproj"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "package restore",
+            "command": "dotnet",
+            "type": "process",
+            "args": ["restore", "-s", "${input:nugetServer}"],
+            "problemMatcher": "$msCompile"
         }
     ],
     "inputs": [
